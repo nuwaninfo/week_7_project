@@ -27,7 +27,7 @@ const fetchData = async (event) => {
       const data = await response.json()
 
       if (data.token) {
-        localStorage.setItem("auth_token", data.token)
+        localStorage.setItem("token", data.token)
       }
     }
   } catch (error) {
