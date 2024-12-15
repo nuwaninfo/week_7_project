@@ -27,7 +27,6 @@ router.post("/api/user/register", async (req: Request, res: Response) => {
       (user) => user.email === email
     )
 
-    console.log(isUserExists)
     if (isUserExists) {
       return res.status(403).json({ username: "User already exists" })
     }
@@ -38,7 +37,6 @@ router.post("/api/user/register", async (req: Request, res: Response) => {
     const newUser: TUser = { email: email, password: hash }
 
     users.push(newUser)
-    console.log(users)
 
     return res.status(200).json(newUser)
   } catch (error: any) {
@@ -57,8 +55,6 @@ router.post("/api/user/login", async (req: Request, res: Response) => {
     const password: string = req.body.password
 
     const user: TUser | undefined = users.find((user) => user.email === email)
-
-    console.log(user)
 
     if (!user) {
       return res.status(401).json({ message: "Login failed" })
