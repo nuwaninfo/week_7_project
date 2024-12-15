@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express"
 import bcrypt from "bcrypt"
+import jwt, { JwtPayload } from "jsonwebtoken"
 
 const router: Router = Router()
 
@@ -50,11 +51,34 @@ router.get("/api/user/list", (req: Request, res: Response) => {
   res.json(users)
 })
 
-router.post("/sum", (req: Request, res: Response) => {
-  let numbersArr: number[] = req.body.numbers
-  let sum: number = 0
-  numbersArr.forEach((element) => (sum = sum + element))
-  res.json({ sum: sum })
+router.post("/api/user/login", async (req: Request, res: Response) => {
+  try {
+    const email: string = req.body.email
+    const password: string = req.body.password
+
+    const user: TUser | undefined = users.find((user) => user.email === email)
+
+    console.log(user)
+
+    if (!user) {
+      return res.status(401).json({ message: "Login failed" })
+    }
+
+    if (bcrypt.compareSync(password, user.password)) {
+      const jwtPayload: JwtPayload = {
+        email: user.email,
+      }
+      const token: string = jwt.sign(jwtPayload, process.env.SECRET as string, {
+        expiresIn: "2m",
+      })
+
+      return res.status(200).json({ success: true, token })
+    }
+    return res.status(401).json({ message: "Login failed" })
+  } catch (error: any) {
+    console.error(`Error during user login: ${error}`)
+    return res.status(500).json({ error: "Internal Server Error" })
+  }
 })
 
 export default router
