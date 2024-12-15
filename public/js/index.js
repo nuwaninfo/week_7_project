@@ -1,4 +1,11 @@
 const initializePageLoad = () => {
+  const logOutBtn = document.getElementById("logout")
+
+  logOutBtn.addEventListener("click", function () {
+    localStorage.setItem("token", "")
+    window.location.href = "/login.html"
+  })
+
   const token = localStorage.getItem("token")
   console.log("token", token)
   if (!token) {
