@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express"
 import bcrypt from "bcrypt"
 import jwt, { JwtPayload } from "jsonwebtoken"
+import { validateToken } from "../middleware/validateToken"
 
 const router: Router = Router()
 
@@ -65,7 +66,7 @@ router.post("/api/user/login", async (req: Request, res: Response) => {
         email: user.email,
       }
       const token: string = jwt.sign(jwtPayload, process.env.SECRET as string, {
-        expiresIn: "2m",
+        expiresIn: "10m",
       })
 
       return res.status(200).json({ success: true, token })
@@ -76,5 +77,20 @@ router.post("/api/user/login", async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Internal Server Error" })
   }
 })
+
+router.get(
+  "/api/private",
+  validateToken,
+  async (req: Request, res: Response) => {
+    try {
+      return res
+        .status(200)
+        .json({ message: "This is protected secure route!" })
+    } catch (error: any) {
+      console.log(`Error while fecthing users ${error}`)
+      return res.status(500).json({ error: "Internal Server Error" })
+    }
+  }
+)
 
 export default router
